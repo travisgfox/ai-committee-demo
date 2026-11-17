@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AI tools in my classes — Curriculum Committee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@700&family=Barlow+Semi+Condensed:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#17171b; --paper:#f4f3ef; --slate:#6f6f78; --rule:#d9d6cd; --signal:#0f7a72; --signal-soft:#e3efed;
+    --body:"Roboto",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,Menlo,monospace; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);}
+  .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .deck{position:relative;width:1920px;height:1080px;flex:none;overflow:hidden;}
+  .slide{position:absolute;inset:0;display:none;}
+  .slide.on{display:block;}
+
+  /* screenshot slides: the screen fills the slide */
+  .shot img{width:100%;height:100%;object-fit:contain;display:block;}
+
+  /* live syllabus, scrolled to the tech helper */
+  .live{background:#f4f3ef;}
+  .live iframe{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform:scale(1.5);transform-origin:0 0;background:#f4f3ef;}
+  /* nav: invisible until hovered */
+  .nav{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;z-index:5;opacity:0;transition:opacity .2s;}
+  .nav:hover{opacity:1;}
+  .nav button{font-family:var(--mono);font-size:13px;background:#2a2a30;color:#eee;border:0;padding:8px 12px;cursor:pointer;border-radius:3px;}
+  .nav span{font-family:var(--mono);font-size:13px;color:#aaa;padding:8px 6px;}
+</style>
+</head>
+<body>
+<div class="stage"><div class="deck" id="deck">
+<section class="slide shot" style="background:#f4f3ef"><img src="img/01-syllabus.jpg" alt="Fundamentals syllabus website"></section>
+<section class="slide shot" style="background:#f4f3ef"><img src="img/02-schedule.jpg" alt="Video unit class schedule"></section>
+<section class="slide shot" style="background:#f4f3ef"><img src="img/03-drone-rubric.jpg" alt="Drone Journalism syllabus grading"></section>
+<section class="slide shot" style="background:#ffffff"><img src="img/04-gradebook.jpg" alt="Drone Journalism gradebook, Scores tab, names blurred"></section>
+<section class="slide shot" style="background:#f4f3ef"><img src="img/05-submit.jpg" alt="Upload box on the syllabus"></section>
+<section class="slide shot" style="background:#ffffff"><img src="img/06-drive.jpg" alt="CUNY Google Drive assignment folder, names replaced"></section>
+<section class="slide live">
+  <iframe id="syl" src="https://fundamentals.travisfox.com/#botsugg" title="Fundamentals syllabus: tech helper" loading="eager"></iframe>
+</section>
+<section class="slide shot" style="background:#f4f3ef"><img src="img/08-sequence.jpg" alt="Sequencing slide: five shots from The Town of Lonely Dentists"></section>
+<section class="slide shot" style="background:#ffffff"><img src="img/09a-house.jpg" alt="Script writing: build the foundation, then the house"></section>
+<section class="slide shot" style="background:#ffffff"><img src="img/09b-timeline.jpg" alt="Script writing: same house, in the timeline"></section>
+<section class="slide shot" style="background:#000000"><img src="img/10-reviewatron.jpg" alt="Newmark Video Review-a-Tron"></section>
+<section class="slide shot" style="background:#000000"><img src="img/11-pitch.jpg" alt="Review-a-Tron: pitch"></section>
+<section class="slide shot" style="background:#000000"><img src="img/12-rough.jpg" alt="Review-a-Tron: rough cut"></section>
+<section class="slide shot" style="background:#000000"><img src="img/14-ai-summary.jpg" alt="Review-a-Tron: AI summary of video feedback"></section>
+<section class="slide shot" style="background:#ffffff"><img src="img/15-email.jpg" alt="Feedback email to student, names replaced"></section>
+</div></div>
+<div class="nav"><button id="prev" aria-label="Previous slide">←</button><span id="count"></span><button id="next" aria-label="Next slide">→</button><button id="fs" aria-label="Full screen">⛶</button></div>
+
+<script>
+(function(){
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0;
+  function fit(){ var s = Math.min(window.innerWidth/1920, window.innerHeight/1080); deck.style.transform = 'scale(' + s + ')'; }
+  function show(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s, k){
+      var on = k === i; s.classList.toggle('on', on);
+      s.querySelectorAll('video').forEach(function(v){ if(on){ v.play().catch(function(){}); } else { v.pause(); } });
+    });
+    document.getElementById('count').textContent = (i+1) + ' / ' + slides.length;
+    try { history.replaceState(null, '', '#' + (i+1)); } catch(e){}
+  }
+  var start = parseInt((location.hash || '').slice(1), 10);
+  fit(); window.addEventListener('resize', fit);
+  show(isNaN(start) ? 0 : start - 1);
+  document.addEventListener('keydown', function(e){
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i+1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i-1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length-1);
+    if (e.key === 'f') { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){}); else document.exitFullscreen(); }
+  });
+  document.getElementById('prev').onclick = function(){ show(i-1); };
+  document.getElementById('next').onclick = function(){ show(i+1); };
+  document.getElementById('fs').onclick = function(){ if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){}); else document.exitFullscreen(); };
+})();
+
+/* Slide 7 is the real syllabus. On travisfox.com it is same-origin, so scroll it to show the
+   intro paragraph, the chat box and the disclaimer together. Elsewhere the #botsugg anchor is the fallback. */
+(function(){
+  var f = document.getElementById('syl');
+  if (!f) return;
+  f.addEventListener('load', function(){
+    try {
+      var d = f.contentDocument, box = d.querySelector('.botbox');
+      var intro = box && box.previousElementSibling;
+      var top = (intro || box).getBoundingClientRect().top + f.contentWindow.scrollY - 60;
+      f.contentWindow.scrollTo(0, top);
+    } catch(e) {}
+  });
+})();
+</script>
+</body>
+</html>
