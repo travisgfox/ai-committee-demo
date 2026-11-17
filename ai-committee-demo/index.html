@@ -19,7 +19,7 @@
   .slide.on{display:block;}
 
   /* screenshot slides: the screen fills the slide */
-  .shot img{width:100%;height:100%;object-fit:contain;display:block;}
+  .shot.on{display:flex;align-items:center;justify-content:center;} .shot img{display:block;max-width:none;}
 
   /* live syllabus, scrolled to the tech helper */
   .live{background:#f4f3ef;}
@@ -58,7 +58,7 @@
   var deck = document.getElementById('deck');
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var i = 0;
-  function fit(){ var s = Math.min(window.innerWidth/1920, window.innerHeight/1080); deck.style.transform = 'scale(' + s + ')'; }
+  function fit(){ var s = Math.min(window.innerWidth/1920, window.innerHeight/1080); deck.style.transform = 'scale(' + s + ')'; document.querySelectorAll('.shot img').forEach(function(im){ var w = im.naturalWidth, h = im.naturalHeight; if(!w){ im.onload = fit; return; } var k = Math.min(1, window.innerWidth / w, window.innerHeight / h); im.style.width = (w * k / s) + 'px'; im.style.height = (h * k / s) + 'px'; }); }
   function show(n){
     i = Math.max(0, Math.min(slides.length-1, n));
     slides.forEach(function(s, k){
